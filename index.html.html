@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algoritmo Humano — Desafio da Botânica (Respostas Aleatórias)</title>
+<style>
+:root{
+  --green:#247a3d; --green2:#3e9b56; --light:#eef8f0;
+  --dark:#17351f; --gold:#d99b18; --red:#b83a3a;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:Arial,Helvetica,sans-serif;
+  background:linear-gradient(135deg,#eaf7ed,#dcefe2);
+  color:#17351f;min-height:100vh;
+}
+header{
+  background:linear-gradient(135deg,#17652e,#2f8b47);
+  color:white;padding:28px 18px;text-align:center;
+  box-shadow:0 3px 12px #0002;
+}
+header h1{margin:0 0 8px;font-size:clamp(25px,5vw,42px)}
+header p{margin:4px 0;font-size:17px}
+.container{max-width:900px;margin:22px auto;padding:0 15px}
+.card{
+  background:white;border-radius:18px;padding:25px;
+  box-shadow:0 5px 18px #00000016;margin-bottom:18px;
+}
+.info{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:12px;margin-bottom:18px;
+}
+.info div{background:var(--light);padding:14px;border-radius:12px}
+.progress{height:13px;background:#d9e8dc;border-radius:20px;overflow:hidden;margin:10px 0 20px}
+.progress-bar{height:100%;background:linear-gradient(90deg,#247a3d,#76bd55);width:0%;transition:.4s}
+.badge{
+  display:inline-block;background:#e7f5e9;color:#17652e;
+  padding:7px 11px;border-radius:20px;font-weight:bold;font-size:14px;
+}
+h2{color:#17652e;margin-top:8px}
+h3{margin-bottom:8px}
+.question{font-size:19px;line-height:1.5}
+.options{display:grid;gap:11px;margin:18px 0}
+.option{
+  border:2px solid #cbdccc;background:#fbfefb;border-radius:12px;
+  padding:14px;text-align:left;cursor:pointer;font-size:16px;
+  transition:.2s;
+}
+.option:hover{border-color:#3e9b56;background:#f0faf2}
+.option.selected{border-color:#247a3d;background:#e0f3e4}
+.option.correct{border-color:#25803d;background:#dff3e4}
+.option.wrong{border-color:#b83a3a;background:#fde5e5}
+button{
+  border:0;border-radius:12px;padding:13px 20px;font-size:16px;
+  font-weight:bold;cursor:pointer;
+}
+.primary{background:#247a3d;color:white}
+.primary:hover{background:#195f2e}
+.secondary{background:#e9f1ea;color:#245b32}
+.continue{
+  display:none;width:100%;margin-top:15px;background:#d99b18;color:white;
+  font-size:17px;
+}
+.continue:hover{background:#b9820f}
+.feedback{
+  display:none;padding:15px;border-radius:12px;margin-top:12px;line-height:1.5
+}
+.feedback.ok{background:#e1f4e5;border-left:5px solid #25803d}
+.feedback.no{background:#fde7e7;border-left:5px solid #b83a3a}
+.phase{color:#6a6a6a;font-weight:bold}
+.mission-title{font-size:25px}
+.tip{background:#fff8df;border-left:5px solid #d99b18;padding:13px;border-radius:8px}
+.hidden{display:none}
+.final{text-align:center}
+.score{font-size:46px;font-weight:bold;color:#247a3d}
+.small{font-size:14px;color:#666}
+footer{text-align:center;padding:20px;color:#53705a;font-size:13px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌱 Algoritmo Humano — Desafio da Botânica</h1>
+  <p>Ciências • Ensino Fundamental II</p>
+  <p>Aprendendo Botânica por meio de perguntas, evidências e decisões.</p>
+</header>
+
+<div class="container">
+
+  <section class="card" id="intro">
+    <div class="info">
+      <div><strong>📚 Componente:</strong><br>Ciências</div>
+      <div><strong>🌿 Tema:</strong><br>Botânica</div>
+      <div><strong>👩‍🎓 Público:</strong><br>Ensino Fundamental II</div>
+      <div><strong>🎯 Missões:</strong><br>10 desafios</div>
+    </div>
+
+    <h2>📘 Habilidade da BNCC</h2>
+    <p><strong>EF07CI07</strong> — Caracterizar os principais ecossistemas brasileiros quanto à paisagem, à quantidade de água, ao tipo de solo, à disponibilidade de luz solar, à temperatura etc., correlacionando essas características à flora e fauna específicas.</p>
+    <p class="small">A habilidade é mobilizada no jogo principalmente ao relacionar características das plantas às condições ambientais e aos ecossistemas.</p>
+
+    <h2>🎮 Como jogar</h2>
+    <p>Em cada missão você passará por <strong>4 fases</strong>. Leia a situação, escolha uma resposta e use o botão <strong>Continuar</strong> para avançar. A proposta é pensar como um algoritmo: observar, organizar informações, decidir e verificar.</p>
+    <div class="tip">💡 Não é necessário decorar tudo. Observe as pistas apresentadas em cada missão e use seus conhecimentos de Ciências.</div>
+    <br>
+    <button class="primary" onclick="startGame()">🌱 Começar o jogo</button>
+  </section>
+
+  <section class="card hidden" id="game">
+    <span class="badge" id="missionBadge">Missão 1 de 10</span>
+    <h2 class="mission-title" id="missionTitle"></h2>
+    <div class="progress"><div class="progress-bar" id="progress"></div></div>
+
+    <div id="phaseContent"></div>
+    <div id="feedback" class="feedback"></div>
+
+    <button class="primary continue" id="continueBtn" onclick="nextPhase()">➡️ Continuar</button>
+  </section>
+
+  <section class="card final hidden" id="final">
+    <h2>🌳 Desafio concluído!</h2>
+    <p>Você terminou as 10 missões de Botânica.</p>
+    <div class="score" id="finalScore">0/40</div>
+    <p id="finalMessage"></p>
+    <div class="tip">
+      🌱 As plantas são fundamentais para os ecossistemas. Conhecer sua estrutura, funcionamento e adaptações ajuda a compreender melhor a vida e o ambiente.
+    </div>
+    <br>
+    <button class="primary" onclick="location.reload()">🔄 Jogar novamente</button>
+  </section>
+
+</div>
+
+<footer>
+  Algoritmo Humano — Desafio da Botânica • Ciências • Ensino Fundamental II
+</footer>
+
+<script>
+const missions = [
+{
+ title:"As partes de uma planta",
+ context:"Uma turma recebeu uma muda de feijão. Os estudantes observaram raízes, caule e folhas e querem descobrir a principal função de cada estrutura.",
+ phases:[
+  {type:"alg", q:"Qual deve ser o primeiro passo do grupo para investigar a planta de maneira organizada?",
+   options:["Escolher uma resposta antes de observar.","Arrancar todas as folhas.","Observar as estruturas e registrar o que foi encontrado.","Colocar a planta no escuro imediatamente."],answer:2, exp:"Um algoritmo começa organizando a investigação. Observar e registrar evidências é um bom primeiro passo."},
+  {type:"bot", q:"Qual estrutura geralmente absorve água e sais minerais do solo?",
+   options:["Raiz","Flor","Fruto","Folha"],answer:0, exp:"As raízes exercem importante função de absorção de água e sais minerais, além de ajudar na fixação da planta."},
+   {type:"ia",q:"🤖 A IA respondeu: “A raiz tem a função de absorver água e sais minerais, mas depois que a água entra na planta ela não precisa mais da raiz.” Qual é a melhor avaliação?",options:["A resposta está correta, porque a raiz só funciona quando o solo está molhado.","A resposta está totalmente errada, porque a raiz não participa da entrada de água.","A resposta está parcialmente correta, mas é incompleta: a raiz participa da absorção e também ajuda na fixação da planta; o transporte da água para outras partes ocorre pelos tecidos condutores.","Não é possível avaliar essa resposta."],answer:2,exp:"A IA acertou ao relacionar a raiz à absorção de água e sais minerais, mas sua explicação ficou incompleta. A raiz também ajuda a fixar a planta, enquanto o transporte da água para outras partes envolve o xilema."}
+  ,{type:"evidence", q:"Qual conclusão reúne melhor as evidências da missão?",
+   options:["Todas as partes da planta fazem exatamente a mesma coisa.","Raiz, caule, folhas e estruturas reprodutivas possuem funções relacionadas à sobrevivência e reprodução da planta.","Somente as folhas são importantes.","As plantas não dependem do ambiente."],answer:1, exp:"As diferentes estruturas vegetais apresentam funções especializadas e trabalham de forma integrada."}
+ ]
+},
+{
+ title:"Fotossíntese e luz",
+ context:"Duas plantas semelhantes foram colocadas em locais diferentes. Uma recebeu luz suficiente e a outra ficou durante vários dias em um ambiente escuro.",
+ phases:[
+  {type:"alg",q:"Qual comparação seria mais adequada para investigar o efeito da luz?",
+   options:["Mudar luz, água, solo e temperatura ao mesmo tempo.","Observar apenas a planta que ficou no escuro.","Retirar as folhas das duas plantas.","Comparar plantas semelhantes mantendo outras condições o mais parecidas possível."],answer:3, exp:"Para investigar uma variável, é importante manter as demais condições tão semelhantes quanto possível."},
+  {type:"bot",q:"Qual é a principal função da luz na fotossíntese?",
+   options:["Substituir a água do solo.","Fornecer energia para o processo fotossintético.","Transformar a raiz em flor.","Impedir totalmente a respiração celular."],answer:1, exp:"A luz fornece energia para a fotossíntese, processo em que a planta produz matéria orgânica a partir de água e dióxido de carbono."},
+   {type:"ia",q:"🤖 A IA respondeu: “Como a planta usa a luz na fotossíntese, podemos dizer que a luz é o alimento da planta.” O que há de inadequado nessa explicação?",options:["A ideia confunde fonte de energia com alimento: a luz fornece energia para a fotossíntese, enquanto a planta produz matéria orgânica nesse processo.","A luz não tem nenhuma relação com a fotossíntese.","A planta recebe seu alimento pronto diretamente da luz.","A fotossíntese acontece somente durante a noite."],answer:0,exp:"A IA está tentando explicar a importância da luz, mas usa uma comparação inadequada. A luz fornece energia para a fotossíntese; ela não é um alimento que entra na planta."}
+  ,{type:"evidence",q:"Qual observação ajudaria a investigar a importância da luz?",
+   options:["Usar somente uma planta e não fazer registros.","Comparar o desenvolvimento de plantas semelhantes submetidas a diferentes condições de iluminação.","Mudar todas as condições ao mesmo tempo.","Ignorar as diferenças observadas."],answer:1, exp:"Uma comparação controlada permite relacionar diferenças no desenvolvimento às condições de iluminação."}
+ ]
+},
+{
+ title:"Água e transporte na planta",
+ context:"Após regar uma planta, os alunos querem entender como a água chega até as folhas.",
+ phases:[
+  {type:"alg",q:"Qual sequência de investigação é mais adequada?",
+   options:["Tirar uma conclusão → procurar evidências que confirmem a conclusão.","Mudar várias características sem registrar nada.","Escolher a resposta mais popular.","Observar a planta → formular uma pergunta → testar/observar evidências → tirar uma conclusão."],answer:3, exp:"A sequência organiza o raciocínio científico: observação, pergunta, investigação e conclusão."},
+  {type:"bot",q:"Qual estrutura conduz água e sais minerais das raízes para outras partes da planta?",
+   options:["Pólen","Fruto","Xilema","Estômato"],answer:2, exp:"O xilema é um tecido vascular especializado no transporte de água e sais minerais, principalmente das raízes para a parte aérea."},
+   {type:"ia",q:"🤖 A IA respondeu: “A água que chega às folhas passa pelo caule. Portanto, basta imaginar que o caule é um tubo simples por onde a água sobe.” Qual é o principal problema dessa explicação?",options:["O caule nunca participa do transporte de água.","A água é produzida pelas folhas e desce pelo caule.","A comparação é suficiente para explicar todo o transporte da água na planta.","A comparação ajuda a imaginar o caminho, mas simplifica demais: existem tecidos condutores, como o xilema, envolvidos nesse transporte."],answer:3,exp:"A comparação com um tubo pode ajudar a entender a ideia geral, mas não explica como o transporte ocorre. O xilema é um tecido especializado no transporte de água e sais minerais."}
+  ,{type:"evidence",q:"Uma experiência usa água colorida em uma planta com caule claro. O aparecimento da cor em partes superiores pode indicar:",
+   options:["Que a planta deixou de respirar.","Que as raízes viraram folhas.","Movimento da água pelo sistema vascular da planta.","Que a água foi produzida pela flor."],answer:2, exp:"A água colorida pode evidenciar o caminho percorrido pela água nos tecidos condutores."}
+ ]
+},
+{
+ title:"Folhas e trocas gasosas",
+ context:"Uma folha apresenta pequenas estruturas chamadas estômatos, que participam das trocas gasosas e da perda de água.",
+ phases:[
+  {type:"alg",q:"Se o objetivo é investigar a função dos estômatos, qual pista deve ser observada?",
+   options:["Sua localização na superfície da folha e sua relação com trocas gasosas.","A cor do vaso onde a planta está.","O tamanho do recipiente usado para transportar a planta.","A quantidade de sementes dentro do fruto."],answer:0, exp:"Os estômatos são estruturas da epiderme vegetal relacionadas às trocas gasosas e à transpiração."},
+  {type:"bot",q:"Qual gás entra normalmente na folha para ser utilizado na fotossíntese?",
+   options:["Oxigênio","Nitrogênio puro","Dióxido de carbono","Hélio"],answer:2, exp:"O dióxido de carbono é uma das matérias-primas utilizadas na fotossíntese."},
+   {type:"ia",q:"🤖 A IA respondeu: “Os estômatos precisam ficar abertos para a planta realizar trocas gasosas. Por isso, durante todo o dia eles permanecem abertos.” Como avaliar essa conclusão?",options:["Está correta porque os estômatos nunca mudam de abertura.","Está incorreta porque os estômatos não participam das trocas gasosas.","A primeira ideia está relacionada à função dos estômatos, mas a conclusão é exagerada: a abertura dos estômatos pode variar, ajudando a controlar as trocas gasosas e a perda de água.","Está correta somente em plantas que vivem na água."],answer:2,exp:"Os estômatos participam das trocas gasosas, mas não precisam permanecer sempre abertos. Sua abertura pode variar de acordo com as condições da planta e do ambiente."}
+  ,{type:"evidence",q:"Por que os estômatos são importantes para a planta?",
+   options:["Porque produzem sementes diretamente.","Porque substituem as raízes.","Porque participam das trocas gasosas e influenciam a perda de água.","Porque impedem qualquer entrada de gases."],answer:2, exp:"Os estômatos ajudam a controlar as trocas gasosas e estão diretamente relacionados à transpiração."}
+ ]
+},
+{
+ title:"Flores, frutos e sementes",
+ context:"Uma flor de jardim foi visitada por abelhas. Depois de algum tempo, formou-se um fruto contendo sementes.",
+ phases:[
+  {type:"alg",q:"Qual pergunta ajuda a investigar a relação entre a visita das abelhas e a reprodução da planta?",
+   options:["A visita pode favorecer a transferência de pólen entre flores?","Qual é a cor favorita da abelha?","O vaso é mais bonito que outro?","A planta consegue viver sem qualquer estrutura reprodutiva?"],answer:0, exp:"A transferência de pólen é uma etapa importante da reprodução de muitas plantas com flores."},
+  {type:"bot",q:"Qual é uma função importante do fruto?",
+   options:["Absorver água diretamente do solo.","Substituir as raízes.","Realizar toda a fotossíntese da planta.","Proteger e/ou auxiliar na dispersão das sementes."],answer:3, exp:"Em muitas angiospermas, o fruto se desenvolve a partir de estruturas da flor e pode proteger e auxiliar na dispersão das sementes."},
+   {type:"ia",q:"🤖 A IA respondeu: “Se uma flor foi visitada por uma abelha e depois apareceu um fruto, então podemos afirmar que aquela abelha foi responsável pela formação do fruto.” Qual cuidado devemos ter com essa conclusão?",options:["A observação mostra uma relação possível, mas sozinha não prova que aquela abelha foi a responsável; seria necessário considerar outras evidências sobre a polinização.","A conclusão é obrigatoriamente verdadeira porque abelhas sempre produzem frutos.","A visita de animais nunca tem relação com a reprodução das plantas.","Frutos aparecem antes da polinização em todas as plantas."],answer:0,exp:"A visita da abelha pode estar relacionada à polinização, mas uma única observação não permite afirmar sozinha que ela causou a formação do fruto. É preciso considerar evidências do processo reprodutivo."}
+  ,{type:"evidence",q:"Qual sequência representa melhor parte do processo reprodutivo de uma planta com flores?",
+   options:["Raiz → folha → água → fruto, sempre nessa ordem reprodutiva.","Fruto → luz → raiz → pólen.","Semente → caule → solo, sem participação de estruturas reprodutivas.","Polinização → fecundação → formação de sementes, com desenvolvimento do fruto em muitas angiospermas."],answer:3, exp:"A sequência simplificada relaciona polinização, fecundação e formação de sementes; nas angiospermas, o fruto geralmente se desenvolve associado às estruturas reprodutivas."}
+ ]
+},
+{
+ title:"Dispersão de sementes",
+ context:"Uma planta produz sementes que são levadas pelo vento. Outra produz frutos consumidos por animais, que podem transportar suas sementes.",
+ phases:[
+  {type:"alg",q:"Qual característica deve ser investigada para descobrir se uma semente pode ser dispersa pelo vento?",
+   options:["A quantidade de água no copo do laboratório.","A cor do solo apenas.","Formato, tamanho e presença de estruturas que favoreçam o transporte pelo ar.","O número de folhas da planta, sem observar as sementes."],answer:2, exp:"Características como tamanho, massa e estruturas semelhantes a asas ou pelos podem favorecer a dispersão pelo vento."},
+  {type:"bot",q:"Por que a dispersão das sementes pode ser vantajosa?",
+   options:["Pode reduzir a competição entre a planta-mãe e novas plantas e favorecer a ocupação de novos locais.","Impede qualquer germinação.","Faz a planta deixar de realizar fotossíntese.","Transforma todas as sementes em frutos."],answer:0, exp:"A dispersão pode diminuir a competição por recursos próximos à planta-mãe e permitir que sementes alcancem novos ambientes."},
+   {type:"ia",q:"🤖 A IA respondeu: “Se algumas sementes são levadas pelo vento, então as sementes precisam ser pequenas para serem dispersadas.” Qual é o problema dessa afirmação?",options:["O vento nunca participa da dispersão de sementes.","A afirmação é razoável, mas não considera outras características: formato, massa e estruturas como pelos ou asas também podem favorecer a dispersão pelo vento.","Todas as sementes grandes são obrigatoriamente levadas pelo vento.","As sementes só podem ser dispersadas por animais."],answer:1,exp:"Ser pequena pode ajudar em alguns casos, mas não é a única característica importante. Formato, massa e estruturas que facilitam o transporte pelo ar também podem influenciar a dispersão."}
+  ,{type:"evidence",q:"Um fruto carnoso é consumido por um animal e suas sementes aparecem posteriormente longe da planta-mãe. Isso é um exemplo de:",
+   options:["Fotossíntese.","Dispersão por animais.","Transpiração.","Absorção radicular."],answer:1, exp:"O transporte das sementes por animais é uma forma de dispersão que pode levar sementes a outros locais."}
+ ]
+},
+{
+ title:"Plantas e ambientes secos",
+ context:"Cactos e outras plantas de ambientes secos apresentam características que ajudam a enfrentar períodos de pouca disponibilidade de água.",
+ phases:[
+  {type:"alg",q:"Para comparar adaptações de plantas de ambientes secos, o que seria importante observar?",
+   options:["Características estruturais e relacioná-las às condições ambientais.","Somente o nome popular das plantas.","A música tocada no ambiente.","A cor da parede do laboratório."],answer:0, exp:"A investigação deve relacionar características observáveis das plantas às condições do ambiente em que vivem."},
+  {type:"bot",q:"Qual característica pode ajudar algumas plantas de ambientes secos a reduzir a perda de água?",
+   options:["Abertura permanente de todos os estômatos.","Ausência completa de raízes.","Produção de água pela luz.","Cutícula mais espessa e redução da área foliar em algumas espécies."],answer:3, exp:"Em várias plantas de ambientes secos, características como cutícula espessa, folhas reduzidas e outros mecanismos podem contribuir para diminuir a perda de água."},
+   {type:"ia",q:"🤖 A IA respondeu: “Os cactos vivem em lugares secos porque aprenderam a transformar suas folhas em espinhos quando faltou água.” Por que essa explicação precisa ser corrigida?",options:["Cactos não possuem nenhuma adaptação relacionada à falta de água.","Espinhos são sempre frutos modificados.","A planta decide conscientemente mudar suas folhas quando sente sede.","A explicação atribui uma mudança consciente à planta; nos cactos, os espinhos são folhas modificadas e características desse tipo estão relacionadas à adaptação ao ambiente ao longo das gerações."],answer:3,exp:"As plantas não modificam conscientemente suas características porque 'decidiram' fazê-lo. Nos cactos, os espinhos são folhas modificadas, e características que favorecem a sobrevivência em ambientes secos foram selecionadas ao longo das gerações."}
+  ,{type:"evidence",q:"O que uma adaptação vegetal representa?",
+   options:["Uma característica que pode aumentar as chances de sobrevivência e reprodução em determinado ambiente ao longo das gerações.","Uma mudança feita conscientemente pela planta.","Uma característica que é sempre igual em todos os ambientes.","Uma prova de que todas as plantas vivem no mesmo habitat."],answer:0, exp:"Adaptações são características hereditárias que podem favorecer a sobrevivência e reprodução em determinadas condições ambientais."}
+ ]
+},
+{
+ title:"Plantas de ambientes úmidos",
+ context:"Em uma área de floresta úmida há grande disponibilidade de água, elevada umidade e diferentes níveis de luz sob o dossel.",
+ phases:[
+  {type:"alg",q:"Para investigar o efeito da luz no crescimento de plantas da floresta, qual comparação é mais adequada?",
+   options:["Mudar luz, água, temperatura e solo ao mesmo tempo.","Comparar plantas em diferentes níveis de luz, controlando outras condições quando possível.","Observar apenas uma folha sem registrar dados.","Escolher plantas de espécies completamente diferentes sem considerar isso."],answer:1, exp:"Controlar as condições ajuda a identificar a relação entre a variável investigada e o resultado."},
+  {type:"bot",q:"Por que plantas do sub-bosque podem apresentar adaptações relacionadas à luz?",
+   options:["Porque recebem menos luz do que plantas diretamente expostas ao sol.","Porque não precisam de luz para processos metabólicos.","Porque vivem sem água.","Porque todas as folhas são subterrâneas."],answer:0, exp:"A vegetação abaixo do dossel pode receber menor intensidade de luz, favorecendo características que ajudam a aproveitar a luz disponível."},
+   {type:"ia",q:"🤖 A IA respondeu: “Como uma floresta úmida tem bastante água, todas as plantas que vivem nela podem crescer igualmente bem em qualquer lugar da floresta.” Qual é a falha dessa conclusão?",options:["A água é o único fator que influencia as plantas.","Todas as plantas precisam exatamente da mesma quantidade de luz.","A disponibilidade de água não é o único fator: luz, solo, temperatura e outras condições também podem influenciar onde as plantas conseguem se desenvolver.","As plantas de florestas úmidas não precisam de luz."],answer:2,exp:"Mesmo em uma floresta úmida, as condições variam. A quantidade de luz, o tipo de solo, a temperatura e outros fatores ajudam a determinar quais plantas conseguem se desenvolver em cada local."}
+  ,{type:"evidence",q:"Qual relação está correta?",
+   options:["O ambiente nunca influencia a distribuição das plantas.","Características das plantas podem estar relacionadas às condições de luz, água, temperatura e solo do ambiente.","Todas as plantas têm exatamente as mesmas necessidades.","As plantas escolhem conscientemente onde nascer."],answer:1, exp:"A distribuição da flora está relacionada às condições ambientais e às características das espécies."}
+ ]
+},
+{
+ title:"Ciclos de vida das plantas",
+ context:"Uma semente de feijão germina, forma uma pequena plântula, cresce e posteriormente pode produzir flores e sementes.",
+ phases:[
+  {type:"alg",q:"Qual sequência representa melhor o acompanhamento do experimento?",
+   options:["Plantar → concluir imediatamente → observar depois.","Observar uma vez → afirmar que todas as plantas são iguais.","Selecionar sementes → plantar → observar regularmente → registrar mudanças → analisar resultados.","Retirar a semente antes da germinação."],answer:2, exp:"O acompanhamento ao longo do tempo permite registrar mudanças e analisar o desenvolvimento da planta."},
+  {type:"bot",q:"O que é germinação?",
+   options:["Processo em que a semente inicia o desenvolvimento de uma nova planta em condições adequadas.","Transformação de uma folha em fruto.","Produção de luz pela raiz.","Secagem completa da semente."],answer:0, exp:"Na germinação, a semente retoma intensa atividade metabólica e inicia o desenvolvimento da nova planta."},
+   {type:"ia",q:"🤖 A IA respondeu: “Se uma semente recebeu água e não germinou no primeiro dia, então aquela semente não é capaz de germinar.” Qual é o erro?",options:["Uma única observação não é suficiente para concluir isso: a germinação depende de condições adequadas e pode levar algum tempo, além de variar entre espécies.","Toda semente precisa germinar no mesmo dia.","A água impede a germinação.","Sementes nunca precisam de condições ambientais adequadas."],answer:0,exp:"Não germinar no primeiro dia não prova que a semente não pode germinar. É preciso considerar tempo e condições como água, temperatura e características da espécie."}
+  ,{type:"evidence",q:"Qual registro seria mais útil para acompanhar o crescimento de uma planta?",
+   options:["Datas, medidas e observações padronizadas ao longo do tempo.","Somente uma opinião no final.","Apenas o nome da planta.","Uma fotografia sem data e sem comparação."],answer:0, exp:"Registros padronizados permitem acompanhar mudanças e comparar resultados ao longo do tempo."}
+ ]
+},
+{
+ title:"Botânica e ecossistemas",
+ context:"Uma área natural possui solo, água, luz, plantas, animais, fungos e microrganismos. As plantas fazem parte das relações que mantêm o funcionamento do ecossistema.",
+ phases:[
+  {type:"alg",q:"Ao estudar a vegetação de um ecossistema, qual conjunto de fatores deve ser considerado?",
+   options:["Somente o tamanho das plantas.","Somente os animais.","Apenas a quantidade de folhas.","Luz, água, solo, temperatura e características das espécies."],answer:3, exp:"A distribuição e as características da flora estão relacionadas a fatores bióticos e abióticos do ambiente."},
+  {type:"bot",q:"Qual é um papel ecológico importante das plantas?",
+   options:["Consumir todos os animais do ecossistema.","Produzir matéria orgânica pela fotossíntese e participar das cadeias e teias alimentares.","Impedir a existência de decompositores.","Eliminar a luz solar."],answer:1, exp:"As plantas são importantes produtores em muitos ecossistemas, convertendo energia luminosa em energia química durante a fotossíntese."},
+   {type:"ia",q:"🤖 A IA respondeu: “Como as plantas produzem matéria orgânica pela fotossíntese, elas conseguem viver sem nenhuma relação com outros seres vivos.” Qual avaliação é mais adequada?",options:["A afirmação está correta porque produtores não dependem de outros organismos.","A afirmação está correta somente para árvores.","A fotossíntese elimina a necessidade de qualquer interação ecológica.","A afirmação confunde produzir matéria orgânica com viver isoladamente: plantas podem interagir com polinizadores, dispersores, decompositores e outros organismos."],answer:3,exp:"As plantas são produtoras em muitos ecossistemas, mas isso não significa que vivam isoladamente. Elas estabelecem diversas relações com outros organismos, como polinizadores, dispersores e decompositores."}
+  ,{type:"evidence",q:"Qual conclusão está mais de acordo com a Botânica e a Ecologia?",
+   options:["Todas as plantas vivem igualmente bem em qualquer ambiente.","A flora está relacionada às condições ambientais e às interações entre organismos, contribuindo para o funcionamento dos ecossistemas.","O solo não interfere na vegetação.","A luz não tem importância para as plantas."],answer:1, exp:"A flora de um ambiente resulta da interação entre características das espécies, fatores ambientais e relações ecológicas."}
+ ]
+}
+];
+
+let missionIndex=0, phaseIndex=0, totalScore=0, answered=false;
+
+function startGame(){
+  document.getElementById('intro').classList.add('hidden');
+  document.getElementById('game').classList.remove('hidden');
+  showPhase();
+}
+
+function showPhase(){
+  const m=missions[missionIndex], p=m.phases[phaseIndex];
+  document.getElementById('missionBadge').textContent=`Missão ${missionIndex+1} de ${missions.length}`;
+  document.getElementById('missionTitle').textContent=m.title;
+  document.getElementById('progress').style.width=`${((missionIndex*4+phaseIndex)/(missions.length*4))*100}%`;
+  document.getElementById('feedback').style.display='none';
+  document.getElementById('feedback').className='feedback';
+  const btn=document.getElementById('continueBtn');
+  btn.style.display='none';
+  answered=false;
+
+  const names={alg:"FASE 1 — ALGORITMO",bot:"FASE 2 — INVESTIGAÇÃO BOTÂNICA",ia:"FASE 3 — ANALISANDO A RESPOSTA DA IA",evidence:"FASE 4 — EVIDÊNCIA CIENTÍFICA"};
+  let html=`<div class="phase">${names[p.type]}</div>
+  <p class="question"><strong>🌿 Situação:</strong> ${m.context}</p>
+  <p class="question"><strong>${p.q}</strong></p>
+  <div class="options">`;
+  p.options.forEach((o,i)=>html+=`<button class="option" onclick="answer(${i})">${String.fromCharCode(65+i)}) ${o}</button>`);
+  html+=`</div>`;
+  document.getElementById('phaseContent').innerHTML=html;
+}
+
+function answer(choice){
+  if(answered)return;
+  answered=true;
+  const p=missions[missionIndex].phases[phaseIndex];
+  const opts=document.querySelectorAll('.option');
+  opts.forEach((b,i)=>{
+    b.disabled=true;
+    if(i===p.answer)b.classList.add('correct');
+    if(i===choice && choice!==p.answer)b.classList.add('wrong');
+  });
+  const fb=document.getElementById('feedback');
+  if(choice===p.answer){
+    totalScore++;
+    fb.className='feedback ok';
+    fb.innerHTML=`<strong>✅ Correto!</strong> ${p.exp}`;
+  }else{
+    fb.className='feedback no';
+    fb.innerHTML=`<strong>❌ Ainda não.</strong> A resposta correta é <strong>${String.fromCharCode(65+p.answer)}) ${p.options[p.answer]}</strong><br>${p.exp}`;
+  }
+  fb.style.display='block';
+  const btn=document.getElementById('continueBtn');
+  btn.style.display='block';
+  btn.textContent=(phaseIndex===3 && missionIndex===missions.length-1)?"🏁 Finalizar jogo":"➡️ Continuar";
+}
+
+function nextPhase(){
+  if(!answered)return;
+  if(phaseIndex<3){
+    phaseIndex++;
+    showPhase();
+  }else if(missionIndex<missions.length-1){
+    missionIndex++;
+    phaseIndex=0;
+    showPhase();
+  }else{
+    finishGame();
+  }
+}
+
+function finishGame(){
+  document.getElementById('game').classList.add('hidden');
+  document.getElementById('final').classList.remove('hidden');
+  document.getElementById('finalScore').textContent=`${totalScore}/40`;
+  let msg="";
+  if(totalScore>=36)msg="🌟 Excelente! Você demonstrou domínio dos principais conceitos trabalhados.";
+  else if(totalScore>=28)msg="👏 Muito bom! Você apresentou um bom conhecimento de Botânica.";
+  else if(totalScore>=20)msg="🌱 Bom começo! Revise os conteúdos e tente novamente para avançar ainda mais.";
+  else msg="🔎 Continue investigando! A ciência também é feita de perguntas, tentativas e novas descobertas.";
+  document.getElementById('finalMessage').textContent=msg;
+}
+</script>
+</body>
+</html>
